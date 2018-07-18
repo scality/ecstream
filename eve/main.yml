@@ -1,0 +1,30 @@
+---
+version: 0.2
+
+branches:
+  user/*, dev/*, q/*, w/*:
+    stage: pre-merge
+
+stages:
+  pre-merge:
+    worker:
+      type: docker
+      path: eve/centos7
+      volumes:
+        - '/home/eve/workspace'
+    steps:
+      - Git:
+          name: git pull
+          repourl: "%(prop:git_reference)s"
+          shallow: True
+          retryFetch: True
+          haltOnFailure: True
+      - ShellCommand:
+          name: install dependencies
+          command: npm install
+      - ShellCommand:
+          name: ESLint
+          command: npm run lint
+      - ShellCommand:
+          name: unit, functional tests with coverage
+          command: npm run coverage
