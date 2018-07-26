@@ -1,4 +1,4 @@
-# Stremed Reed-Solomon erasure coding
+# Streamed Reed-Solomon erasure coding
 
 ## Contributing
 
