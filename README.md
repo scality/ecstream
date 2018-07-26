@@ -35,3 +35,9 @@ npm run coverage
 npm test -- -h
 
 ```
+
+### Running benchmark
+Output a CSV to compare between raw and streaming overlay of encoding.
+```shell
+NODE_ENV=production node benchmark.js
+```
