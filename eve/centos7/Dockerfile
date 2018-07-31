@@ -9,7 +9,9 @@ ENV HOME_BUILDBOT /var/lib/buildbot
 RUN yum install -y epel-release
 RUN yum clean all && yum install -y \
     ca-certificates \
+    make \
     gcc \
+    gcc-c++ \
     git \
     openssh-client \
     python \
