@@ -38,7 +38,10 @@ function checkOutStream(outstream, streamId, expectedContent, callback) {
         assert.ok(read + chunk.length <= expectedContent.length);
         for (let p = 0; p < chunk.length; ++p) {
             if (chunk[p] !== expectedContent[read + p]) {
-                const err = new Error(`[Stream ${streamId}] Content mismatch (offset ${read + p}): Expected: ${expectedContent[read + p]}, Found: ${chunk[p]}`);
+                const errHeader = `[Stream ${streamId}] Content mismatch (offset ${read + p})`;
+                const errExpected = `Expected: ${expectedContent[read + p]}`;
+                const errActual = `Actual: ${chunk[p]}`;
+                const err = new Error(`${errHeader} - ${errExpected}, ${errActual}`);
                 callback(err);
                 mismatchFound = true;
                 return;
