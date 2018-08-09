@@ -22,7 +22,7 @@ mocha.describe('Erasure invariant test suite', function () {
     codes.forEach(code => {
         const [k, m] = code;
         stripeSizes.forEach(stripeSize => {
-            for (let kill = 0; kill < m; ++kill) {
+            for (let kill = 0; kill <= m; ++kill) {
                 const descr = `RS(${k}, ${m}), stripeSize=${stripeSize}, kill=${kill}`;
 
                 mocha.it(descr, function (done) {

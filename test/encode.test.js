@@ -43,17 +43,14 @@ mocha.describe('Erasure encoding test suite', function () {
     });
 
     mocha.it('Input smaller than k * stripe size', function (done) {
-        const content = Buffer.concat([
-            Buffer.alloc(1023, 0x1),
-        ]);
+        const content = Buffer.alloc(1023, 0x1);
         const input = streamMe(content);
         let waiting = 3;
         const finalizer = err => {
             --waiting;
             if (err) {
-                waiting = -1;
                 done(err);
-                return;
+                waiting = 0; // avoid multiple calls to done()
             } else if (waiting === 0) {
                 done();
             }
@@ -94,7 +91,7 @@ mocha.describe('Erasure encoding test suite', function () {
             --waiting;
             if (err) {
                 done(err);
-                return;
+                waiting = 0; // avoid multiple calls to done()
             } else if (waiting === 0) {
                 done();
             }
@@ -131,7 +128,7 @@ mocha.describe('Erasure encoding test suite', function () {
             --waiting;
             if (err) {
                 done(err);
-                return;
+                waiting = 0; // avoid multiple calls to done()
             } else if (waiting === 0) {
                 done();
             }
@@ -168,7 +165,7 @@ mocha.describe('Erasure encoding test suite', function () {
         const input = new stream.PassThrough();
 
         // Put partial input
-        input.push(content.slice(0, 177));
+        input.write(content.slice(0, 177));
         // Emit error after a timeout
         const error = new Error('On purpose...');
         setTimeout(() => input.emit('error', error), 20);
@@ -238,7 +235,7 @@ mocha.describe('Erasure encoding test suite', function () {
             --waiting;
             if (err) {
                 done(err);
-                return;
+                waiting = 0; // avoid multiple calls to done()
             } else if (waiting === 0) {
                 done();
             }

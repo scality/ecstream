@@ -13,7 +13,7 @@ const stream = require('stream');
 function streamMe(buffer) {
     const streamed = new stream.Readable();
     streamed.push(buffer);
-    streamed.push(null);
+    setImmediate(() => streamed.push(null));
     return streamed;
 }
 
