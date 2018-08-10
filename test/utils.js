@@ -4,17 +4,29 @@
 const assert = require('assert');
 const stream = require('stream');
 
+
 /**
  * Create a readable stream from a buffer/string
  *
  * @param {String|Buffer} buffer to stream
+ * @param {Number} chunkSize - Forces readings of chunkSize
  * @return {stream.Readable} readable stream
  */
-function streamMe(buffer) {
-    const streamed = new stream.Readable();
-    streamed.push(buffer);
-    setImmediate(() => streamed.push(null));
-    return streamed;
+function streamMe(buffer, chunkSize = 512 * 1024) {
+    const streaming = new stream.Readable({ read() {} });
+    let leftover = buffer;
+    const interval = setInterval(
+        () => {
+            if (leftover.length > 0) {
+                streaming.push(leftover.slice(0, chunkSize));
+                leftover = leftover.slice(chunkSize);
+            } else {
+                streaming.push(null);
+                clearInterval(interval);
+            }
+        },
+        1);
+    return streaming;
 }
 
 
