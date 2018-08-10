@@ -43,7 +43,10 @@ mocha.describe('Erasure encoding test suite', function () {
     });
 
     mocha.it('Input smaller than k * stripe size', function (done) {
-        const content = Buffer.alloc(1023, 0x1);
+        const content = Buffer.concat([
+            Buffer.alloc(512, 0x1),
+            Buffer.alloc(511, 0x2),
+        ]);
         const input = streamMe(content);
         let waiting = 3;
         const finalizer = err => {
@@ -62,14 +65,14 @@ mocha.describe('Erasure encoding test suite', function () {
 
         const data2 = new stream.PassThrough();
         const expectedContent2 = Buffer.concat([
-            Buffer.alloc(511, 0x1),
+            Buffer.alloc(511, 0x2),
             Buffer.alloc(1, 0x0),
         ]);
         checkOutStream(data2, 1, expectedContent2, finalizer);
 
         const parity = new stream.PassThrough();
         const expectedContentParity = Buffer.concat([
-            Buffer.alloc(511, 0x1 ^ 0x1),
+            Buffer.alloc(511, 0x1 ^ 0x2),
             Buffer.alloc(1, 0x1),
         ]);
         checkOutStream(parity, 2, expectedContentParity, finalizer);

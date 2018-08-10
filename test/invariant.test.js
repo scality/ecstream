@@ -42,12 +42,19 @@ mocha.describe('Erasure invariant test suite', function () {
                     // Shoot random parts - up to 'kill'
                     const filteredDataStreams = [...dataStreams];
                     const filteredParityStreams = [...parityStreams];
+                    const dead = new Map();
                     for (let c = 0; c < kill; ++c) {
-                        const die = Math.floor(Math.random() * (k + m));
-                        if (die < k) {
-                            filteredDataStreams[die] = null;
+                        const kill = Math.floor(Math.random() * (k + m));
+                        if (dead.has(kill)) {
+                            continue;
+                        }
+                        dead.set(kill, true);
+                        if (kill < k) {
+                            filteredDataStreams[kill].resume();
+                            filteredDataStreams[kill] = null;
                         } else {
-                            filteredParityStreams[die - k] = null;
+                            filteredParityStreams[kill - k].resume();
+                            filteredParityStreams[kill - k] = null;
                         }
                     }
 
