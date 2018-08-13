@@ -14,7 +14,7 @@
   "repository": "scality/ecstream",
   "author": "Maxime Lubin",
   "dependencies": {
-    "@ronomon/reed-solomon": "5.0.0"
+    "@ronomon/reed-solomon": "5.0.1"
   },
   "devDependencies": {
     "eslint": "2.13.1",
