@@ -1,6 +1,7 @@
 'use strict'; // eslint-disable-line strict
 /* eslint-disable max-len */
 /* eslint-disable no-console */
+/* eslint-disable no-loop-func */
 
 const CPUS = require('os').cpus();
 process.UV_THREADPOOL_SIZE = CPUS.length;
@@ -51,7 +52,9 @@ function oneShotEncoding(data, k, m, stripeSize, kill) {
                 // Twice, to fake encode + decode
                 const latencyMs = 2 * ((elapsedS * 1e9) + elapsedNs) * 1e-6;
                 const bandwidth = 2 * data.length / (latencyMs * 1e-3) / (1e6);
-                console.log(['buffer', k, m, stripeSize, kill, latencyMs, bandwidth].join(','));
+                console.log(['buffer', data.length, data.length,
+                             k, m, stripeSize, kill,
+                             latencyMs, bandwidth].join(','));
                 resolve();
             });
     });
@@ -66,16 +69,17 @@ function oneShotEncoding(data, k, m, stripeSize, kill) {
  * @param {Number} m - Number of parity parts
  * @param {Number} stripeSize - Length S of stripe (total = (k+m) * S)
  * @param {Number} kill - Number of missing parts
+ * @param {Number} chunkSize - Chunk size to use
  * @return {Promise} Promise to wait on
  */
-function streamEncoding(data, k, m, stripeSize, kill) {
+function streamEncoding(data, k, m, stripeSize, kill, chunkSize) {
     const dataStreams = [...Array(k).keys()].map(
         () => new stream.PassThrough());
     const parityStreams = [...Array(m).keys()].map(
         () => new stream.PassThrough());
 
     // Input
-    const input = streamMe(data);
+    const input = streamMe(data, chunkSize);
 
     // Shoot random parts - up to 'kill'
     const filteredDataStreams = [...dataStreams];
@@ -101,7 +105,9 @@ function streamEncoding(data, k, m, stripeSize, kill) {
             // Twice buffer length because we encoded + decoded
             // Note that output checking is also comprised in the measurement.
             const bandwidth = 2 * data.length / (latencyMs * 1e-3) / (1e6);
-            console.log(['stream', k, m, stripeSize, kill, latencyMs, bandwidth].join(','));
+            console.log(['stream', data.length, chunkSize,
+                         k, m, stripeSize, kill,
+                         latencyMs, bandwidth].join(','));
             resolve();
         });
 
@@ -123,27 +129,30 @@ function streamEncoding(data, k, m, stripeSize, kill) {
  *
  * @param {[[Number]]} codes - Each entry should be [k, m] to test
  * @param {[Number]} stripeSizes - Stripe sizes to test
+ * @param {[Number]} chunkSizes - Chunk sizes to test
  * @return {Promise} Promise to wait on, resolved when all becnhmarks are finished
  */
-function benchmark(codes, stripeSizes) {
+function benchmark(codes, stripeSizes, chunkSizes) {
     const randomBuffer = crypto.randomBytes(64 * 1024 * 1024 + 23);
 
     // Write CSV header
-    console.log('type,k,m,stripeSize,kill,latencyMs,bandwidthMBs');
+    console.log('type,size,chunkSize,k,m,stripeSize,kill,latencyMs,bandwidthMBs');
 
     let promiseChain = Promise.resolve();
 
     codes.forEach(code => {
         const [k, m] = code;
         stripeSizes.forEach(stripeSize => {
-            for (let kill = 0; kill < m; ++kill) {
+            for (let kill = 0; kill <= m; ++kill) {
                 // Chain promises, perform 1 bench at a time
                 promiseChain = promiseChain.then(
                     () => oneShotEncoding(
                         randomBuffer, k, m, stripeSize, kill));
-                promiseChain = promiseChain.then(
-                    () => streamEncoding(
-                        randomBuffer, k, m, stripeSize, kill));
+                chunkSizes.forEach(chunkSize => {
+                    promiseChain = promiseChain.then(
+                        () => streamEncoding(
+                            randomBuffer, k, m, stripeSize, kill, chunkSize));
+                });
             }
         });
     });
@@ -156,5 +165,6 @@ function benchmark(codes, stripeSizes) {
 if (typeof require !== 'undefined' && require.main === module) {
     const codes = [[2, 1], [4, 2], [9, 3], [5, 6], [24, 6]];
     const stripeSizes = [8192, 8192 * 4, 1024 * 1024];
-    benchmark(codes, stripeSizes);
+    const chunkSizes = [16 * 1024, 64 * 1024, 128 * 1024, 1024 * 1024, 8 * 1024 * 1024];
+    benchmark(codes, stripeSizes, chunkSizes);
 }
