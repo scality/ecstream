@@ -166,7 +166,7 @@ mocha.describe('Erasure decoding test suite', function () {
     });
 
     mocha.it('Large stripe size', function (done) {
-        const stripeSize = ecstream.safeStripeSize(2, 1, 1024 * 1024 * 8);
+        const stripeSize = ecstream.safeStripeSize(2, 1024 * 1024 * 8);
         const dataStream = streamMe(Buffer.alloc(stripeSize, 0x66));
         const parityStream = streamMe(Buffer.alloc(stripeSize, 0x42 ^ 0x66));
 
