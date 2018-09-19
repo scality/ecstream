@@ -23,6 +23,9 @@ stages:
           name: install dependencies
           command: npm install
       - ShellCommand:
+          name: audit installed packages
+          command: npm audit
+      - ShellCommand:
           name: ESLint
           command: npm run lint
       - ShellCommand:
