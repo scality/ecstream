@@ -2,7 +2,7 @@
 version: 0.2
 
 branches:
-  user/*, dev/*, q/*, w/*:
+  user/*, dev/*, q/*, w/*, bugfix/*:
     stage: pre-merge
 
 stages:

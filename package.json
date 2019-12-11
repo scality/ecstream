@@ -8,7 +8,7 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint $(git ls-files '*.js')",
-    "test": "mocha --use_strict --check-leaks --no-exit ",
+    "test": "mocha --use_strict --check-leaks ",
     "coverage": "nyc --check-coverage --exclude 'test/*' --lines=90 --reporter=text mocha --use_strict --check-leaks "
   },
   "repository": "scality/ecstream",
@@ -22,7 +22,7 @@
     "eslint-config-scality": "scality/Guidelines#GA7.2.0.5",
     "eslint-plugin-react": "4.2.3",
     "mocha": "5.2.0",
-    "nyc": "12.0.2"
+    "nyc": "^14.1.1"
   },
   "license": "Apache-2.0",
   "bugs": {

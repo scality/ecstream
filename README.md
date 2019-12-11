@@ -1,5 +1,8 @@
 # Streamed Reed-Solomon erasure coding
 
+IMPORTANT: the development on this repo has been paused and it is no longer actively maintained
+
+
 ## Contributing
 
 In order to contribute, please follow the
