@@ -17,7 +17,7 @@
     "@ronomon/reed-solomon": "5.0.1"
   },
   "devDependencies": {
-    "eslint": "2.13.1",
+    "eslint": "4.18.2",
     "eslint-config-airbnb": "6.2.0",
     "eslint-config-scality": "scality/Guidelines#GA7.2.0.5",
     "eslint-plugin-react": "4.2.3",
